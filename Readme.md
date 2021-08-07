@@ -13,3 +13,4 @@
 
 - [x] cmake_project_example
 - [x] first_opengl_example
+- [ ] point_example
