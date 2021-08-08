@@ -12,6 +12,7 @@ add_executable(${PROJECT_NAME}
   src/main.cpp
   src/common.cpp src/common.h
   src/shader.cpp src/shader.h
+  src/program.cpp src/program.h
   ) # 파일들을 컴파일해서 실행파일을 만든다.
 
 include(Dependency.cmake)

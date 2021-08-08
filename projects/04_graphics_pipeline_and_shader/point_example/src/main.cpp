@@ -1,5 +1,6 @@
 #include "common.h"
 #include "shader.h"
+#include "program.h"
 
 // 윈도우의 프레임버퍼 크기가 변경되었을 때 호출하기 위한 콜백 정의
 void OnFramebufferSizeChange(GLFWwindow *window, int width, int height) // 윈도우의 크기가 병경되었을 때마다 윈도우의 새로운 width와 height를 받아온다.
@@ -77,10 +78,21 @@ int main(int argc, const char **argv)
     SPDLOG_INFO("OpenGL context version: {}", glVersion); // 출력 예) OpenGL context version: 3.3.0 NVIDIA 471.11
     // NVIDIA의 opengl 함수를 가져왔다는 뜻.
 
-    auto vertexShader = Shader::CreateFromFile("./shader/simple.vs", GL_VERTEX_SHADER);
-    auto fragmentShader = Shader::CreateFromFile("./shader/simple.fs", GL_FRAGMENT_SHADER);
-    SPDLOG_INFO("vertex shader id: {}", vertexShader->Get());
-    SPDLOG_INFO("fragment shader id: {}", fragmentShader->Get());
+    // shader 생성
+    // Shader 인스턴스가 unique_ptr에서 shared_ptr로 변환되었음을 유의
+    ShaderPtr vertShader = Shader::CreateFromFile("./shader/simple.vs", GL_VERTEX_SHADER);
+    ShaderPtr fragShader = Shader::CreateFromFile("./shader/simple.fs", GL_FRAGMENT_SHADER);
+    /* 
+        앞에 ShaderPtr로 타입을 명시해줘야 unique_ptr이 shadred_ptr로 바뀐다.
+        auto로 쓰면 CreateFromFile의 반환타이빈 unique_ptr이 그대로 쓰인다. 
+        auto vertShader = Shader::CreateFromFile("./shader/simple.vs", GL_VERTEX_SHADER);
+    */
+    SPDLOG_INFO("vertex shader id: {}", vertShader->Get());
+    SPDLOG_INFO("fragment shader id: {}", fragShader->Get());
+
+    // program 생성
+    auto program = Program::Create({fragShader, vertShader});
+    SPDLOG_INFO("program id: {}", program->Get());
 
     // 정의한 콜백을 윈도우에 등록
     OnFramebufferSizeChange(window, WINDOW_WIDTH, WINDOW_HEIGHT);    // 윈도우 생성 직후에는 프레임버퍼 변경 이벤트가 발생하지 않으므로 첫 호출은 수동으로 함
