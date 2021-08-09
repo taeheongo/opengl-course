@@ -12,15 +12,14 @@ bool Context::Init()
 {
     // 정점 데이터를 담은 array
     float vertices[] = {
-        -0.5f,
-        -0.5f,
-        0.0f,
-        0.5f,
-        -0.5f,
-        0.0f,
-        0.0f,
-        0.5f,
-        0.0f,
+        // first triangle
+        0.5f, 0.5f, 0.0f,  // top right
+        0.5f, -0.5f, 0.0f, // bottom right
+        -0.5f, 0.5f, 0.0f, // top left
+        // second triangle
+        0.5f, -0.5f, 0.0f,  // bottom right
+        -0.5f, -0.5f, 0.0f, // bottom left
+        -0.5f, 0.5f, 0.0f   // top left
     };
 
     // 순서주의; VAO 바인딩 -> VBO 바이딩 -> vertex attribute setting
@@ -30,14 +29,14 @@ bool Context::Init()
     glBindVertexArray(m_vertexArrayObject);     // 지금부터 사용할 VAO 지정
 
     // VBO(Vertex Buffer Object) 바인딩
-    glGenBuffers(1, &m_vertexBuffer);                                           // 새로운 buffer object를 만든다
-    glBindBuffer(GL_ARRAY_BUFFER, m_vertexBuffer);                              // 지금부터 사용할 buffer object를 지정한다
-                                                                                // GL_ARRAY_BUFFER : 사용할 buffer object는 vertex data를 저장할 용도임을 알려줌
-    glBufferData(GL_ARRAY_BUFFER, sizeof(float) * 9, vertices, GL_STATIC_DRAW); // 지정된 buffer에 데이터를 복사한다
-                                                                                // 용도는 "STATIC | DYNAMIC | STREAM", "DRAW | COPY | READ"의 조합
-                                                                                // 버퍼의 데이터를 바꾸지 않을거라면 STATIC, 바꾼다면 DYNAMIC
-                                                                                // STREAM은 버퍼를 한번 세팅하고 바로 버릴 예정일 경우
-                                                                                // 용도에 맞는 flag를 지정해야 효율이 올라감
+    glGenBuffers(1, &m_vertexBuffer);                                            // 새로운 buffer object를 만든다
+    glBindBuffer(GL_ARRAY_BUFFER, m_vertexBuffer);                               // 지금부터 사용할 buffer object를 지정한다
+                                                                                 // GL_ARRAY_BUFFER : 사용할 buffer object는 vertex data를 저장할 용도임을 알려줌
+    glBufferData(GL_ARRAY_BUFFER, sizeof(float) * 18, vertices, GL_STATIC_DRAW); // 지정된 buffer에 데이터를 복사한다
+                                                                                 // 용도는 "STATIC | DYNAMIC | STREAM", "DRAW | COPY | READ"의 조합
+                                                                                 // 버퍼의 데이터를 바꾸지 않을거라면 STATIC, 바꾼다면 DYNAMIC
+                                                                                 // STREAM은 버퍼를 한번 세팅하고 바로 버릴 예정일 경우
+                                                                                 // 용도에 맞는 flag를 지정해야 효율이 올라감
     // vertex attribute setting
     glEnableVertexAttribArray(0);                                          // 정점 attribute 중 n번째를 사용하도록 설정
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, 0); // n: 정점의 n번째 attribute
@@ -79,7 +78,7 @@ void Context::Render()
     glClear(GL_COLOR_BUFFER_BIT); // 컬러버퍼 안에 있는 색상으로 화면을 지움.
 
     glUseProgram(m_program->Get());
-    glDrawArrays(GL_TRIANGLES, 0, 3); // glDrawArray(primitive, offset, count) : 현재 설정된 program, VBO, VAO로 그림을 그린다
+    glDrawArrays(GL_TRIANGLES, 0, 6); // glDrawArray(primitive, offset, count) : 현재 설정된 program, VBO, VAO로 그림을 그린다
                                       // primitive: 그리고자 하는 primitive 타입
                                       // offset: 그리고자 하는 첫 정점의 index
                                       // count: 그리려는 정점의 총 개수
