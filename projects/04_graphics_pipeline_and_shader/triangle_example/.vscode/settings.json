@@ -1,0 +1,11 @@
+{
+  "C_Cpp.intelliSenseEngineFallback": "Enabled",
+  "C_Cpp.default.configurationProvider": "ms-vscode.cmake-tools",
+  "files.associations": {
+      "optional": "cpp"
+  },
+  "cmake.debugConfig": {
+    "cwd": "${workspaceFolder}" // debug를 실행할때 실행되는 현재 위치를 현재 workspaceFolder로 하겠다.
+                                // 이걸 해줘야 shader파일을 현재 workspaceFolder기준에서 파일경로를 계산함. "./shader/simple.fs"
+  }
+}
