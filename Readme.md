@@ -15,4 +15,4 @@
 - [x] first_opengl_example
 - [x] point_example
 - [x] triangle_example
-- [ ] glsl
+- [x] glsl_example
