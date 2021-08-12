@@ -98,16 +98,30 @@ bool Context::Init()
     glClearColor(0.0f, 0.1f, 0.2f, 0.0f); // 화면을 지울 색상 지정을 컬러버퍼에 설정.
 
     // image 로드
-    // auto image = Image::Load("./image/container.jpg");
-    // if (!image)
-    //     return false;
-    // SPDLOG_INFO("image: {}x{}, {} channels", image->GetWidth(), image->GetHeight(), image->GetChannelCount());
+    auto image2 = Image::Load("./image/awesomeface.png");
+    if (!image2)
+        return false;
+    SPDLOG_INFO("image: {}x{}, {} channels", image2->GetWidth(), image2->GetHeight(), image2->GetChannelCount());
 
-    // image 생성
-    auto image = Image::Create(512, 512);
-    image->SetCheckImage(16, 16);
+    auto image = Image::Load("./image/container.jpg");
+    if (!image)
+        return false;
+    SPDLOG_INFO("image: {}x{}, {} channels", image->GetWidth(), image->GetHeight(), image->GetChannelCount());
 
-    m_texture = Texture::CreateFromImage(image.get()); // image자체는 unique_ptr unique_ptr에서 일반 포인터를 구하려면 get() .
+    m_texture = Texture::CreateFromImage(image.get());
+
+    m_texture2 = Texture::CreateFromImage(image2.get());
+
+    glActiveTexture(GL_TEXTURE0);                   // glActiveTexture(textureSlot) : 함수로 현재 다루고자 하는 텍스처 슬롯을 선택
+    glBindTexture(GL_TEXTURE_2D, m_texture->Get()); // glBindTexture(textureType, textureId) : 함수로 현재 설정중인 텍스처 슬롯에 우리의 텍스처 오브젝트를 바인딩
+    glActiveTexture(GL_TEXTURE1);
+    glBindTexture(GL_TEXTURE_2D, m_texture2->Get());
+
+    m_program->Use();
+    // glGetUniformLocation() 함수로 shader 내의 sampler2D uniform 핸들을 얻어옴
+    // glUniform1i() 함수로 sampler2D uniform에 텍스처 슬롯 인덱스를 입력
+    glUniform1i(glGetUniformLocation(m_program->Get(), "tex"), 0);
+    glUniform1i(glGetUniformLocation(m_program->Get(), "tex2"), 1);
 
     return true;
 }

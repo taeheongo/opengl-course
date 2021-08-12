@@ -20,6 +20,9 @@ Image::~Image()
 
 bool Image::LoadWithStb(const std::string &filepath)
 {
+    // 이미지 상하 반전의 이유 : 보통의 이미지는 좌상단을 원점으로 함. OpenGL은 좌하단을 원점으로 함.
+    stbi_set_flip_vertically_on_load(true); // 이미지 로딩시 상하를 반전시켜서 문제를 해결할 수 있음
+
     m_data = stbi_load(filepath.c_str(), &m_width, &m_height, &m_channelCount, 0);
     if (!m_data)
     {

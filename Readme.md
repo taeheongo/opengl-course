@@ -16,4 +16,4 @@
 - [x] point_example
 - [x] triangle_example
 - [x] glsl_example
-- [ ] texture_example
+- [x] texture_example
