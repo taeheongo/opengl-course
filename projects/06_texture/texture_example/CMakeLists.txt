@@ -17,6 +17,7 @@ add_executable(${PROJECT_NAME}
   src/buffer.cpp src/buffer.h
   src/vertex_layout.cpp src/vertex_layout.h
   src/image.cpp src/image.h
+  src/texture.cpp src/texture.h
   ) # 파일들을 컴파일해서 실행파일을 만든다.
 
 include(Dependency.cmake)
