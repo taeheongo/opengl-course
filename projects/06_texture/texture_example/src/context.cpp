@@ -97,10 +97,15 @@ bool Context::Init()
 
     glClearColor(0.0f, 0.1f, 0.2f, 0.0f); // 화면을 지울 색상 지정을 컬러버퍼에 설정.
 
-    auto image = Image::Load("./image/container.jpg");
-    if (!image)
-        return false;
-    SPDLOG_INFO("image: {}x{}, {} channels", image->GetWidth(), image->GetHeight(), image->GetChannelCount());
+    // image 로드
+    // auto image = Image::Load("./image/container.jpg");
+    // if (!image)
+    //     return false;
+    // SPDLOG_INFO("image: {}x{}, {} channels", image->GetWidth(), image->GetHeight(), image->GetChannelCount());
+
+    // image 생성
+    auto image = Image::Create(512, 512);
+    image->SetCheckImage(16, 16);
 
     m_texture = Texture::CreateFromImage(image.get()); // image자체는 unique_ptr unique_ptr에서 일반 포인터를 구하려면 get() .
 
