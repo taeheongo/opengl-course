@@ -38,7 +38,12 @@ void Texture::CreateTexture()
     glGenTextures(1, &m_texture); // OpenGL texture object 생성
     // bind and set default filter and wrap option
     Bind();
-    SetFilter(GL_LINEAR, GL_LINEAR);
+    // SetFilter(GL_LINEAR, GL_LINEAR); // GL_LINEAR로 설정을하고 이미지를 줄이면 의도치 않는 줄무늬가 생긴다.
+    SetFilter(GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR); // minimum filter를 GL_LINEAR_MIPMAP_LINEAR로 변경.
+                                                   // 원래 텍스쳐 사이즈보다 더 작은 경우 mipmap에서 level이 더 높은 이미지를 가져와서 텍스쳐를 붙인다.
+    // Mipmap 필터 옵션의 의미
+    // GL_NEAREST_MIPMAP_NEAREST: 적합한 레벨의 텍스처를 선택한 뒤 nearest neighbor 픽셀을 선택한다
+    // GL_LINEAR_MIPMAP_LINEAR: 적합한 두 레벨의 텍스처에서 linear filtering된 값을 다시 linear interpolation한다(trilinear interpolation)
     SetWrap(GL_CLAMP_TO_EDGE, GL_CLAMP_TO_EDGE);
 }
 
@@ -80,4 +85,6 @@ void Texture::SetTextureFromImage(const Image *image)
     //      format: 입력하는 이미지의 픽셀 포맷
     //      type: 입력하는 이미지의 채널별 데이터 타입
     //      data: 이미지 데이터가 기록된 메모리 주소
+
+    glGenerateMipmap(GL_TEXTURE_2D);
 }
