@@ -123,20 +123,18 @@ bool Context::Init()
     glUniform1i(glGetUniformLocation(m_program->Get(), "tex"), 0);
     glUniform1i(glGetUniformLocation(m_program->Get(), "tex2"), 1);
 
-    // 위치 (1, 0, 0)의 점. 동차좌표계 사용
-    glm::vec4 vec(1.0f, 0.0f, 0.0f, 1.0f);
-    // 단위행렬 기준 (1, 1, 0)만큼 평행이동하는 행렬
-    auto trans = glm::translate(glm::mat4(1.0f), glm::vec3(1.0f, 1.0f, 0.0f));
-    // 단위행렬 기준 z축기준 90도만큼 회전하는 행렬
-    auto rot = glm::rotate(glm::mat4(1.0f),
-                           glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
-    // 단위행렬 기준 모든 축에 대해 3배율 확대하는 행렬
-    auto scale = glm::scale(glm::mat4(1.0f), glm::vec3(3.0f));
-    // 확대 -> 회전 -> 평행이동 순으로 점에 선형 변환 적용
-    vec = trans * rot * scale * vec;
-    // (1, 0, 0) => (3, 0, 0) => (0, 3, 0) => (1, 4, 0)
+    // 0.5배 축소후 z축기준 90도 회전하는 행렬
+    auto transform = glm::rotate(
+        glm::scale(glm::mat4(1.0f), glm::vec3(0.5f)),
+        glm::radians(90.0f),
+        glm::vec3(0.0f, 0.0f, 1.0f));
 
-    SPDLOG_INFO("transformed vec: [{}, {}, {}]", vec.x, vec.y, vec.z);
+    auto transformLoc = glGetUniformLocation(m_program->Get(), "transform");
+    glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(transform));
+    // 첫 번째 인자는 vertexshader의 transform 변수의 handle
+    // 두 번째 인자는 행렬 개수
+    // transpose(전치)의 여부
+    // transform은 16개(4*4)의 value를 저장하고 있는 배열을 가지고 있음. glm::value_ptr은 그 배열의 첫 원소의 주소값을 의미.
 
     return true;
 }
