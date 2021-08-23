@@ -9,50 +9,176 @@ ContextUPtr Context::Create()
     return std::move(context);
 }
 
-// [x, y, z, r, g, b, s, t]
 bool Context::Init()
 {
     // 정점 데이터를 담은 array
-    // [x, y, z, r, g, b, s, t]
+    // [x, y, z, s, t]
     float vertices[] = {
-        0.5f,
-        0.5f,
-        0.0f,
-        1.0f,
-        0.0f,
-        0.0f,
-        1.0f,
-        1.0f,
-        0.5f,
         -0.5f,
-        0.0f,
-        0.0f,
-        1.0f,
-        0.0f,
-        1.0f,
-        0.0f,
         -0.5f,
         -0.5f,
         0.0f,
         0.0f,
-        0.0f,
+        0.5f,
+        -0.5f,
+        -0.5f,
         1.0f,
         0.0f,
+        0.5f,
+        0.5f,
+        -0.5f,
+        1.0f,
+        1.0f,
+        -0.5f,
+        0.5f,
+        -0.5f,
         0.0f,
+        1.0f,
+
+        -0.5f,
         -0.5f,
         0.5f,
         0.0f,
-        1.0f,
+        0.0f,
+        0.5f,
+        -0.5f,
+        0.5f,
         1.0f,
         0.0f,
+        0.5f,
+        0.5f,
+        0.5f,
+        1.0f,
+        1.0f,
+        -0.5f,
+        0.5f,
+        0.5f,
         0.0f,
         1.0f,
+
+        -0.5f,
+        0.5f,
+        0.5f,
+        1.0f,
+        0.0f,
+        -0.5f,
+        0.5f,
+        -0.5f,
+        1.0f,
+        1.0f,
+        -0.5f,
+        -0.5f,
+        -0.5f,
+        0.0f,
+        1.0f,
+        -0.5f,
+        -0.5f,
+        0.5f,
+        0.0f,
+        0.0f,
+
+        0.5f,
+        0.5f,
+        0.5f,
+        1.0f,
+        0.0f,
+        0.5f,
+        0.5f,
+        -0.5f,
+        1.0f,
+        1.0f,
+        0.5f,
+        -0.5f,
+        -0.5f,
+        0.0f,
+        1.0f,
+        0.5f,
+        -0.5f,
+        0.5f,
+        0.0f,
+        0.0f,
+
+        -0.5f,
+        -0.5f,
+        -0.5f,
+        0.0f,
+        1.0f,
+        0.5f,
+        -0.5f,
+        -0.5f,
+        1.0f,
+        1.0f,
+        0.5f,
+        -0.5f,
+        0.5f,
+        1.0f,
+        0.0f,
+        -0.5f,
+        -0.5f,
+        0.5f,
+        0.0f,
+        0.0f,
+
+        -0.5f,
+        0.5f,
+        -0.5f,
+        0.0f,
+        1.0f,
+        0.5f,
+        0.5f,
+        -0.5f,
+        1.0f,
+        1.0f,
+        0.5f,
+        0.5f,
+        0.5f,
+        1.0f,
+        0.0f,
+        -0.5f,
+        0.5f,
+        0.5f,
+        0.0f,
+        0.0f,
     };
     // 정점 인덱스를 담은 array
+    // 한 면당 2개의 삼각형이 필요하므로 12개의 삼각형이 필요.
     uint32_t indices[] = {
-        // note that we start from 0!
-        0, 1, 3, // first triangle
-        1, 2, 3, // second triangle
+        0,
+        2,
+        1,
+        2,
+        0,
+        3,
+        4,
+        5,
+        6,
+        6,
+        7,
+        4,
+        8,
+        9,
+        10,
+        10,
+        11,
+        8,
+        12,
+        14,
+        13,
+        14,
+        12,
+        15,
+        16,
+        17,
+        18,
+        18,
+        19,
+        16,
+        20,
+        22,
+        21,
+        22,
+        20,
+        23,
     };
     // 순서주의; VAO 바인딩 -> VBO 바이딩 -> vertex attribute setting
     // vertex attribute을 설정하기 전에 VBO가 바인딩 되어있을 것
@@ -61,16 +187,15 @@ bool Context::Init()
     m_vertexLayout = VertexLayout::Create();
 
     // VBO(Vertex Buffer Object) 생성, 바인딩, 정점 데이터 추가
-    m_vertexBuffer = Buffer::CreateWithData(GL_ARRAY_BUFFER, GL_STATIC_DRAW, vertices, sizeof(float) * 32);
+    m_vertexBuffer = Buffer::CreateWithData(GL_ARRAY_BUFFER, GL_STATIC_DRAW, vertices, sizeof(float) * 120);
 
     // vertex attribute setting
     // m_vertexLayout->SetAttrib(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, 0);
-    m_vertexLayout->SetAttrib(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 8, 0);
-    m_vertexLayout->SetAttrib(1, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 8, sizeof(float) * 3);
-    m_vertexLayout->SetAttrib(2, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 8, sizeof(float) * 6); // 텍스쳐 좌표는 2차원 이므로 두 번째 인자는 2
+    m_vertexLayout->SetAttrib(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 5, 0);
+    m_vertexLayout->SetAttrib(2, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 5, sizeof(float) * 3); // 텍스쳐 좌표는 2차원 이므로 두 번째 인자는 2
 
     // EBO(Element Buffer Object) 생성, 바인딩, 인덱스 데이터 추가
-    m_indexBuffer = Buffer::CreateWithData(GL_ELEMENT_ARRAY_BUFFER, GL_STATIC_DRAW, indices, sizeof(uint32_t) * 6);
+    m_indexBuffer = Buffer::CreateWithData(GL_ELEMENT_ARRAY_BUFFER, GL_STATIC_DRAW, indices, sizeof(uint32_t) * 36);
 
     // shader 생성
     // Shader 인스턴스가 unique_ptr에서 shared_ptr로 변환되었음을 유의
@@ -143,12 +268,18 @@ bool Context::Init()
 
 void Context::Render()
 {
-    glClear(GL_COLOR_BUFFER_BIT); // 컬러버퍼 안에 있는 색상으로 화면을 지움.
+    // 깊이 테스트 (Depth test) : 어떤 픽셀의 값을 업데이트 하기 전, 현재 그리려는 픽셀의 z값과 깊이 버퍼에 저장된 해당 위치의 z값을 비교해 봄.
+    //                           비교 결과 현재 그리려는 픽셀이 이전에 그려진 픽셀보다 뒤에 있을 경우 픽셀을 그리지 않음
 
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // 각 픽셀의 컬러 값을 저장하는 버퍼 외에, 해당 픽셀의 깊이값 (z축값)을 저장.
+                                                        // OpenGL의 Depth Buffer 초기값은 1. 1이 가장 뒤에 있고, 0이 가장 앞을 의미 (왼손 좌표계)
+    glEnable(GL_DEPTH_TEST);                            // 깊이 테스트를 켠다.
+                                                        // glDepthFunc()을 이용하여 깊이 테스트 통과 조건을 변경할 수 있음. 깊이 테스트 통과 조건의 기본값은 GL_LESS.
+                                                        // depth가 작은 값을 화면에 그림
     m_program->Use();
     // 현재 바인딩된 VAO, VBO, EBO를 바탕으로 그리기
-    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0); // 첫번째 인자는 primitive: 그려낼 기본 primitive 타입,
-                                                         // 두번째 인자는 그리고자 하는 EBO 내 index의 개수 6,
-                                                         // 세번째 인자는 type: index의 데이터형, indices 배열은 uint32_t[]타입이기때문에 GL_UNSIGNED_INT,
-                                                         // 네번째 인자는 pointer/offset: 그리고자 하는 EBO의 첫 데이터로부터의 오프셋
+    glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0); // 첫번째 인자는 primitive: 그려낼 기본 primitive 타입,
+                                                          // 두번째 인자는 그리고자 하는 EBO 내 index의 개수 6,
+                                                          // 세번째 인자는 type: index의 데이터형, indices 배열은 uint32_t[]타입이기때문에 GL_UNSIGNED_INT,
+                                                          // 네번째 인자는 pointer/offset: 그리고자 하는 EBO의 첫 데이터로부터의 오프셋
 }
