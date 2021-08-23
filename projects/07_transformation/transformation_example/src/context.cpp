@@ -243,10 +243,8 @@ bool Context::Init()
     glBindTexture(GL_TEXTURE_2D, m_texture2->Get());
 
     m_program->Use();
-    // glGetUniformLocation() 함수로 shader 내의 sampler2D uniform 핸들을 얻어옴
-    // glUniform1i() 함수로 sampler2D uniform에 텍스처 슬롯 인덱스를 입력
-    glUniform1i(glGetUniformLocation(m_program->Get(), "tex"), 0);
-    glUniform1i(glGetUniformLocation(m_program->Get(), "tex2"), 1);
+    m_program->SetUniform("tex", 0);
+    m_program->SetUniform("tex2", 1);
 
     // x축중심 -55도 회전
     auto model = glm::rotate(glm::mat4(1.0f), glm::radians(-55.0f), glm::vec3(1.0f, 0.0f, 0.0f));
@@ -256,18 +254,24 @@ bool Context::Init()
     auto projection = glm::perspective(glm::radians(45.0f), (float)WINDOW_WIDTH / (float)WINDOW_HEIGHT, 0.01f, 10.0f);
     auto transform = projection * view * model;
 
-    auto transformLoc = glGetUniformLocation(m_program->Get(), "transform");
-    glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(transform));
-    // 첫 번째 인자는 vertexshader의 transform 변수의 handle
-    // 두 번째 인자는 행렬 개수
-    // transpose(전치)의 여부
-    // transform은 16개(4*4)의 value를 저장하고 있는 배열을 가지고 있음. glm::value_ptr은 그 배열의 첫 원소의 주소값을 의미.
+    m_program->SetUniform("transform", transform);
 
     return true;
 }
 
 void Context::Render()
 {
+    // 큐브를 회전.
+    auto projection = glm::perspective(glm::radians(45.0f), (float)640 / (float)480, 0.01f, 10.0f);
+    auto view = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -3.0f));
+    // glfwGetTime()는 glfwInit()함수호출이후 시간이 얼마나 흘렀는가를 초로 반환.
+    // (1.0, 0.5, 0.0) 축을 기준으로 1초에 120도씩(3초에 1바퀴) 회전.
+    auto model = glm::rotate(glm::mat4(1.0f), glm::radians((float)glfwGetTime() * 120.0f), glm::vec3(1.0f, 0.5f, 0.0f));
+
+    auto transform = projection * view * model;
+
+    m_program->SetUniform("transform", transform);
+
     // 깊이 테스트 (Depth test) : 어떤 픽셀의 값을 업데이트 하기 전, 현재 그리려는 픽셀의 z값과 깊이 버퍼에 저장된 해당 위치의 z값을 비교해 봄.
     //                           비교 결과 현재 그리려는 픽셀이 이전에 그려진 픽셀보다 뒤에 있을 경우 픽셀을 그리지 않음
 

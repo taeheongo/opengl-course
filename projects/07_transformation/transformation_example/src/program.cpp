@@ -47,3 +47,22 @@ void Program::Use() const
 {
     glUseProgram(m_program);
 }
+
+void Program::SetUniform(const std::string &name, int value) const
+{
+    // glGetUniformLocation() 함수로 shader 내의 sampler2D uniform 핸들을 얻어옴
+    // glUniform1i() 함수로 sampler2D uniform에 텍스처 슬롯 인덱스를 입력
+    auto loc = glGetUniformLocation(m_program, name.c_str());
+    glUniform1i(loc, value);
+}
+
+void Program::SetUniform(const std::string &name,
+                         const glm::mat4 &value) const
+{
+    auto loc = glGetUniformLocation(m_program, name.c_str());
+    glUniformMatrix4fv(loc, 1, GL_FALSE, glm::value_ptr(value));
+    // 첫 번째 인자는 vertexshader의 transform 변수의 handle
+    // 두 번째 인자는 행렬 개수
+    // transpose(전치)의 여부
+    // transform은 16개(4*4)의 value를 저장하고 있는 배열을 가지고 있음. glm::value_ptr은 그 배열의 첫 원소의 주소값을 의미.
+}
