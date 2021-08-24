@@ -246,16 +246,6 @@ bool Context::Init()
     m_program->SetUniform("tex", 0);
     m_program->SetUniform("tex2", 1);
 
-    // x축중심 -55도 회전
-    auto model = glm::rotate(glm::mat4(1.0f), glm::radians(-55.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-    // 카메라는 원점으로부터 z축 방향으로 -3만큼 떨어짐
-    auto view = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -3.0f));
-    // 종횡비 4:3, 세로화각 45도의 원근 투영
-    auto projection = glm::perspective(glm::radians(45.0f), (float)WINDOW_WIDTH / (float)WINDOW_HEIGHT, 0.01f, 10.0f);
-    auto transform = projection * view * model;
-
-    m_program->SetUniform("transform", transform);
-
     return true;
 }
 
@@ -267,9 +257,30 @@ void Context::Render()
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // 각 픽셀의 컬러 값을 저장하는 버퍼 외에, 해당 픽셀의 깊이값 (z축값)을 저장.
                                                         // OpenGL의 Depth Buffer 초기값은 1. 1이 가장 뒤에 있고, 0이 가장 앞을 의미 (왼손 좌표계)
 
-    glEnable(GL_DEPTH_TEST); // 깊이 테스트를 켠다.
-                             // glDepthFunc()을 이용하여 깊이 테스트 통과 조건을 변경할 수 있음. 깊이 테스트 통과 조건의 기본값은 GL_LESS.
-                             // depth가 작은 값을 화면에 그림
+    glEnable(GL_DEPTH_TEST);                                               // 깊이 테스트를 켠다.
+                                                                           // glDepthFunc()을 이용하여 깊이 테스트 통과 조건을 변경할 수 있음. 깊이 테스트 통과 조건의 기본값은 GL_LESS.
+                                                                           // depth가 작은 값을 화면에 그림
+    float x = sinf((float)glfwGetTime() * glm::pi<float>() * 2.0f) * 3.0f; // 1초에 x값이 0 3 0 -3 0
+    auto cameraPos = glm::vec3(x, 0.0f, 3.0f);                             // EYE
+    auto cameraTarget = glm::vec3(x, 0.0f, 0.0f);                          // AT
+    auto cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);                           // UP
+
+    auto cameraZ = glm::normalize(cameraPos - cameraTarget);      // n = (EYE - AT) / |EYE - AT|
+    auto cameraX = glm::normalize(glm::cross(cameraUp, cameraZ)); // u = (UP cross n) / |up cross n|
+    auto cameraY = glm::cross(cameraZ, cameraX);                  // v = (n cross u) / |n cross u|
+
+    // R = (u v n), T는 z축방향으로 3만큼 translate
+    // T * R
+    auto cameraMat = glm::mat4(
+        glm::vec4(cameraX, 0.0f),
+        glm::vec4(cameraY, 0.0f),
+        glm::vec4(cameraZ, 0.0f),
+        glm::vec4(cameraPos, 1.0f));
+
+    // (R^t) * (T^-1)
+    auto view = glm::inverse(cameraMat);
+
+    auto projection = glm::perspective(glm::radians(45.0f), (float)WINDOW_WIDTH / (float)WINDOW_HEIGHT, 0.01f, 20.0f); // (fovy, aspect, near, fear)
 
     // 여러개의 회전하는 큐브
     // 큐브마다 translate해줄 값을 cubePositions에 저장.
@@ -285,9 +296,6 @@ void Context::Render()
         glm::vec3(1.5f, 0.2f, -1.5f),
         glm::vec3(-1.3f, 1.0f, -1.5f),
     };
-
-    auto projection = glm::perspective(glm::radians(45.0f), (float)WINDOW_WIDTH / (float)WINDOW_HEIGHT, 0.01f, 20.0f);
-    auto view = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -3.0f));
 
     for (size_t i = 0; i < cubePositions.size(); i++)
     {
