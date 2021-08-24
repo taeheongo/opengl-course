@@ -257,30 +257,18 @@ void Context::Render()
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // 각 픽셀의 컬러 값을 저장하는 버퍼 외에, 해당 픽셀의 깊이값 (z축값)을 저장.
                                                         // OpenGL의 Depth Buffer 초기값은 1. 1이 가장 뒤에 있고, 0이 가장 앞을 의미 (왼손 좌표계)
 
-    glEnable(GL_DEPTH_TEST);                                               // 깊이 테스트를 켠다.
-                                                                           // glDepthFunc()을 이용하여 깊이 테스트 통과 조건을 변경할 수 있음. 깊이 테스트 통과 조건의 기본값은 GL_LESS.
-                                                                           // depth가 작은 값을 화면에 그림
-    float x = sinf((float)glfwGetTime() * glm::pi<float>() * 2.0f) * 3.0f; // 1초에 x값이 0 3 0 -3 0
-    auto cameraPos = glm::vec3(x, 0.0f, 3.0f);                             // EYE
-    auto cameraTarget = glm::vec3(x, 0.0f, 0.0f);                          // AT
-    auto cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);                           // UP
+    glEnable(GL_DEPTH_TEST); // 깊이 테스트를 켠다.
+                             // glDepthFunc()을 이용하여 깊이 테스트 통과 조건을 변경할 수 있음. 깊이 테스트 통과 조건의 기본값은 GL_LESS.
+                             // depth가 작은 값을 화면에 그림
+    float angle = glfwGetTime() * glm::pi<float>() * 0.5f;
+    auto x = sinf(angle) * 10.0f;
+    auto z = cosf(angle) * 10.0f;
+    auto cameraPos = glm::vec3(x, 0.0f, z); // xz평면에서 카메라의 위치가 EYE(10 * cos(angle), 10 * sin(angle))
+    auto cameraTarget = glm::vec3(0.0f, 0.0f, 0.0f);
+    auto cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
 
-    auto cameraZ = glm::normalize(cameraPos - cameraTarget);      // n = (EYE - AT) / |EYE - AT|
-    auto cameraX = glm::normalize(glm::cross(cameraUp, cameraZ)); // u = (UP cross n) / |up cross n|
-    auto cameraY = glm::cross(cameraZ, cameraX);                  // v = (n cross u) / |n cross u|
-
-    // R = (u v n), T는 z축방향으로 3만큼 translate
-    // T * R
-    auto cameraMat = glm::mat4(
-        glm::vec4(cameraX, 0.0f),
-        glm::vec4(cameraY, 0.0f),
-        glm::vec4(cameraZ, 0.0f),
-        glm::vec4(cameraPos, 1.0f));
-
-    // (R^t) * (T^-1)
-    auto view = glm::inverse(cameraMat);
-
-    auto projection = glm::perspective(glm::radians(45.0f), (float)WINDOW_WIDTH / (float)WINDOW_HEIGHT, 0.01f, 20.0f); // (fovy, aspect, near, fear)
+    auto view = glm::lookAt(cameraPos, cameraTarget, cameraUp);                                                        // EYE, AT, UP을 가지고 view변환 만들어주는 과정을 알아서해줌.
+    auto projection = glm::perspective(glm::radians(45.0f), (float)WINDOW_WIDTH / (float)WINDOW_HEIGHT, 0.01f, 30.0f); // (fovy, aspect, near, far) far를 크게해주면 잘리는것을 막을 수 있음.
 
     // 여러개의 회전하는 큐브
     // 큐브마다 translate해줄 값을 cubePositions에 저장.
