@@ -95,6 +95,7 @@ int main(int argc, const char **argv)
     {
         glfwPollEvents(); //  60분의 1초 단위마다 키보드 이벤트, 마우스 이벤트 등등 window와 관련된 이벤트 수집.
         // render
+        context->ProcessInput(window);
         context->Render();
         glfwSwapBuffers(window); // front buffer와 back buffer가 있는데 back buffer에 먼저 그림을 그리고 front buffer와 바꿔치기(swap)을 하는 것.
                                  // 그림이 그려지는 과정이 보여지지 않게 하기 위함. 더블 버퍼링이라고함

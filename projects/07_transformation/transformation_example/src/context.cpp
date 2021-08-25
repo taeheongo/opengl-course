@@ -260,14 +260,11 @@ void Context::Render()
     glEnable(GL_DEPTH_TEST); // 깊이 테스트를 켠다.
                              // glDepthFunc()을 이용하여 깊이 테스트 통과 조건을 변경할 수 있음. 깊이 테스트 통과 조건의 기본값은 GL_LESS.
                              // depth가 작은 값을 화면에 그림
-    float angle = glfwGetTime() * glm::pi<float>() * 0.5f;
-    auto x = sinf(angle) * 10.0f;
-    auto z = cosf(angle) * 10.0f;
-    auto cameraPos = glm::vec3(x, 0.0f, z); // xz평면에서 카메라의 위치가 EYE(10 * cos(angle), 10 * sin(angle))
-    auto cameraTarget = glm::vec3(0.0f, 0.0f, 0.0f);
-    auto cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
 
-    auto view = glm::lookAt(cameraPos, cameraTarget, cameraUp);                                                        // EYE, AT, UP을 가지고 view변환 만들어주는 과정을 알아서해줌.
+    auto view = glm::lookAt(
+        m_cameraPos,                                                                                                   // 카메라 위치 EYE
+        m_cameraPos + m_cameraFront,                                                                                   // EYE + n = AT
+        m_cameraUp);                                                                                                   // UP
     auto projection = glm::perspective(glm::radians(45.0f), (float)WINDOW_WIDTH / (float)WINDOW_HEIGHT, 0.01f, 30.0f); // (fovy, aspect, near, far) far를 크게해주면 잘리는것을 막을 수 있음.
 
     // 여러개의 회전하는 큐브
@@ -300,4 +297,26 @@ void Context::Render()
                                                               // 세번째 인자는 type: index의 데이터형, indices 배열은 uint32_t[]타입이기때문에 GL_UNSIGNED_INT,
                                                               // 네번째 인자는 pointer/offset: 그리고자 하는 EBO의 첫 데이터로부터의 오프셋
     }
+}
+
+void Context::ProcessInput(GLFWwindow *window)
+{
+    const float cameraSpeed = 0.05f;
+
+    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+        m_cameraPos += cameraSpeed * m_cameraFront;
+    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+        m_cameraPos -= cameraSpeed * m_cameraFront;
+
+    auto cameraRight = glm::normalize(glm::cross(m_cameraUp, -m_cameraFront)); // u벡터(카메라 기저에서의 x축)
+    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+        m_cameraPos += cameraSpeed * cameraRight;
+    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+        m_cameraPos -= cameraSpeed * cameraRight;
+
+    auto cameraUp = glm::normalize(glm::cross(-m_cameraFront, cameraRight)); //  v벡터(카메라 좌표계에서의 y축)
+    if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS)
+        m_cameraPos += cameraSpeed * cameraUp;
+    if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS)
+        m_cameraPos -= cameraSpeed * cameraUp;
 }
