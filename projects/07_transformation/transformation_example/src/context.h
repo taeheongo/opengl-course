@@ -15,6 +15,7 @@ public:
     static ContextUPtr Create();
     void Render();
     void ProcessInput(GLFWwindow *window);
+    void Reshape(int width, int height);
 
 private:
     Context() {}
@@ -32,6 +33,9 @@ private:
     glm::vec3 m_cameraPos{glm::vec3(0.0f, 0.0f, 3.0f)};
     glm::vec3 m_cameraFront{glm::vec3(0.0f, 0.0f, -1.0f)}; // AT이 아니라 EYE가 바라보고있는 방향 = AT-EYE
     glm::vec3 m_cameraUp{glm::vec3(0.0f, 1.0f, 0.0f)};
+
+    int m_width{WINDOW_WIDTH};
+    int m_height{WINDOW_HEIGHT};
 };
 
 #endif // __CONTEXT_H__

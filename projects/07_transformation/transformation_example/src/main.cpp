@@ -4,7 +4,8 @@
 void OnFramebufferSizeChange(GLFWwindow *window, int width, int height) // 윈도우의 크기가 병경되었을 때마다 윈도우의 새로운 width와 height를 받아온다.
 {
     SPDLOG_INFO("framebuffer size changed: ({} x {})", width, height);
-    glViewport(0, 0, width, height); // glViewport(): OpenGL이 그림을 그릴 화면의 위치 및 크기 설정
+    auto context = (Context *)glfwGetWindowUserPointer(window); // glfwGetWindowUserPointer()의 반환타입이 void*라서 형변환.
+    context->Reshape(width, height);
 }
 
 // 키보드 입력 콜백 정의
@@ -83,6 +84,8 @@ int main(int argc, const char **argv)
         glfwTerminate();
         return -1;
     }
+
+    glfwSetWindowUserPointer(window, context.get()); // user pointer를 통해서 context.get()을 통해서 context의 포인터값을 저장.
 
     // 정의한 콜백을 윈도우에 등록
     OnFramebufferSizeChange(window, WINDOW_WIDTH, WINDOW_HEIGHT);    // 윈도우 생성 직후에는 프레임버퍼 변경 이벤트가 발생하지 않으므로 첫 호출은 수동으로 함

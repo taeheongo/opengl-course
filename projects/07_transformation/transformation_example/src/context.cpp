@@ -262,10 +262,10 @@ void Context::Render()
                              // depth가 작은 값을 화면에 그림
 
     auto view = glm::lookAt(
-        m_cameraPos,                                                                                                   // 카메라 위치 EYE
-        m_cameraPos + m_cameraFront,                                                                                   // EYE + n = AT
-        m_cameraUp);                                                                                                   // UP
-    auto projection = glm::perspective(glm::radians(45.0f), (float)WINDOW_WIDTH / (float)WINDOW_HEIGHT, 0.01f, 30.0f); // (fovy, aspect, near, far) far를 크게해주면 잘리는것을 막을 수 있음.
+        m_cameraPos,                                                                                         // 카메라 위치 EYE
+        m_cameraPos + m_cameraFront,                                                                         // EYE + n = AT
+        m_cameraUp);                                                                                         // UP
+    auto projection = glm::perspective(glm::radians(45.0f), (float)m_width / (float)m_height, 0.01f, 30.0f); // (fovy, aspect, near, far) far를 크게해주면 잘리는것을 막을 수 있음.
 
     // 여러개의 회전하는 큐브
     // 큐브마다 translate해줄 값을 cubePositions에 저장.
@@ -319,4 +319,11 @@ void Context::ProcessInput(GLFWwindow *window)
         m_cameraPos += cameraSpeed * cameraUp;
     if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS)
         m_cameraPos -= cameraSpeed * cameraUp;
+}
+
+void Context::Reshape(int width, int height)
+{
+    m_width = width;
+    m_height = height;
+    glViewport(0, 0, m_width, m_height);
 }
