@@ -1,5 +1,6 @@
 #include "common.h"
 #include "context.h"
+
 // 윈도우의 프레임버퍼 크기가 변경되었을 때 호출하기 위한 콜백 정의
 void OnFramebufferSizeChange(GLFWwindow *window, int width, int height) // 윈도우의 크기가 병경되었을 때마다 윈도우의 새로운 width와 height를 받아온다.
 {
@@ -24,6 +25,13 @@ void OnKeyEvent(GLFWwindow *window,
     {
         glfwSetWindowShouldClose(window, true);
     }
+}
+
+// 마우스 커서 콜백함수 정의
+void OnCursorPos(GLFWwindow *window, double x, double y)
+{
+    auto context = (Context *)glfwGetWindowUserPointer(window);
+    context->MouseMove(x, y);
 }
 
 int main(int argc, const char **argv)
@@ -91,6 +99,7 @@ int main(int argc, const char **argv)
     OnFramebufferSizeChange(window, WINDOW_WIDTH, WINDOW_HEIGHT);    // 윈도우 생성 직후에는 프레임버퍼 변경 이벤트가 발생하지 않으므로 첫 호출은 수동으로 함
     glfwSetFramebufferSizeCallback(window, OnFramebufferSizeChange); // glfwPollEvents()에서 이벤트를 수집하고, 그 이벤트에 해당하는 콜백을 세팅해놓으면 이벤트마다 실행됨.
     glfwSetKeyCallback(window, OnKeyEvent);
+    glfwSetCursorPosCallback(window, OnCursorPos);
 
     // glfw 루프 실행, 윈도우 close 버튼을 누르면 정상 종료
     SPDLOG_INFO("Start main loop");

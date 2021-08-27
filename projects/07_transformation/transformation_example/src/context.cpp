@@ -261,6 +261,12 @@ void Context::Render()
                              // glDepthFunc()을 이용하여 깊이 테스트 통과 조건을 변경할 수 있음. 깊이 테스트 통과 조건의 기본값은 GL_LESS.
                              // depth가 작은 값을 화면에 그림
 
+    // m_cameraFront = vec4(0, 0, -1, 0)를 y축중심 m_cameraYaw, x축중심 m_cameraPitch만큼 회전한 방향벡터.
+    m_cameraFront =
+        glm::rotate(glm::mat4(1.0f), glm::radians(m_cameraYaw), glm::vec3(0.0f, 1.0f, 0.0f)) *
+        glm::rotate(glm::mat4(1.0f), glm::radians(m_cameraPitch), glm::vec3(1.0f, 0.0f, 0.0f)) *
+        glm::vec4(0.0f, 0.0f, -1.0f, 0.0f);
+
     auto view = glm::lookAt(
         m_cameraPos,                                                                                         // 카메라 위치 EYE
         m_cameraPos + m_cameraFront,                                                                         // EYE + n = AT
@@ -326,4 +332,29 @@ void Context::Reshape(int width, int height)
     m_width = width;
     m_height = height;
     glViewport(0, 0, m_width, m_height);
+}
+
+void Context::MouseMove(double x, double y)
+{
+    static glm::vec2 prevPos = glm::vec2((float)x, (float)y);
+    auto pos = glm::vec2((float)x, (float)y);
+    auto deltaPos = pos - prevPos;
+
+    const float cameraRotSpeed = 0.8f;
+    m_cameraYaw -= deltaPos.x * cameraRotSpeed;   // 도리각 (x변화량 * 회전속도조절계수)만큼의 각
+    m_cameraPitch -= deltaPos.y * cameraRotSpeed; // 끄덕각 (y변화량 * 회전속도조절계수)만큼의 각
+
+    // 0 ~ 360도 사이로 조정.
+    if (m_cameraYaw < 0.0f)
+        m_cameraYaw += 360.0f;
+    if (m_cameraYaw > 360.0f)
+        m_cameraYaw -= 360.0f;
+
+    // -90 ~ 90도 사이로 조정.
+    if (m_cameraPitch > 89.0f)
+        m_cameraPitch = 89.0f;
+    if (m_cameraPitch < -89.0f)
+        m_cameraPitch = -89.0f;
+
+    prevPos = pos; // 이전좌표 갱신
 }
