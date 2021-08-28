@@ -254,11 +254,28 @@ bool Context::Init()
 
 void Context::Render()
 {
-    if (ImGui::Begin("my first ImGui window"))
+    if (ImGui::Begin("ui window")) // begin ~ end사이의 코드가 imgui 윈도우 내용, my first ImGui window가 제목.
+                                   // 윈도우를 접으면 ImGui::Begin()의 값이 false가 되고 if문 안의 내용이 실행되지 않는다.
     {
-        ImGui::Text("This is first text...");
+        if (ImGui::ColorEdit4("clear color", glm::value_ptr(m_clearColor)))
+        {
+            glClearColor(m_clearColor.x, m_clearColor.y, m_clearColor.z, m_clearColor.w);
+        }
+        ImGui::Separator();
+        // 드래그 ui를 통해서 카메라 위치, 회전방향 제어.
+        ImGui::DragFloat3("camera pos", glm::value_ptr(m_cameraPos), 0.01f);
+        ImGui::DragFloat("camera yaw", &m_cameraYaw, 0.5);
+        ImGui::DragFloat("camera pitch", &m_cameraPitch, 0.5, -89.0f, 89.0f);
+        ImGui::Separator();
+        if (ImGui::Button("reset camera"))
+        {
+            m_cameraYaw = 0.0f;
+            m_cameraPitch = 0.0f;
+            m_cameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
+        }
     }
     ImGui::End();
+
     // 깊이 테스트 (Depth test) : 어떤 픽셀의 값을 업데이트 하기 전, 현재 그리려는 픽셀의 z값과 깊이 버퍼에 저장된 해당 위치의 z값을 비교해 봄.
     //                           비교 결과 현재 그리려는 픽셀이 이전에 그려진 픽셀보다 뒤에 있을 경우 픽셀을 그리지 않음
 

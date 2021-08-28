@@ -128,7 +128,9 @@ int main(int argc, const char **argv)
     {
         glfwPollEvents();          // 60분의 1초 단위마다 키보드 이벤트, 마우스 이벤트 등등 window와 관련된 이벤트 수집.
         ImGui_ImplGlfw_NewFrame(); // 새로운 프레임 생성. imgui는 매 프레임마다 화면을 그리기때문에 새로운 프레임을 생성해야함.
-        ImGui::NewFrame();         // 새로운 프레임이다라는 것을 imgui에게 알려줌.
+        // ImGui_ImplGlfw_NewFrame()가 GLFWwindow로부터 화면 크기 및 마우스 상태 등을 업데이트
+        // 따라서 별도의 callback 연결 없이 마우스 인터렉션이 가능(창 크기변경, 드래그 등.)
+        ImGui::NewFrame(); // 새로운 프레임이다라는 것을 imgui에게 알려줌.
         // context render
         context->ProcessInput(window);
         context->Render();
