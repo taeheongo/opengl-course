@@ -16,6 +16,8 @@ void OnFramebufferSizeChange(GLFWwindow *window, int width, int height) // 윈�
 void OnKeyEvent(GLFWwindow *window,
                 int key, int scancode, int action, int mods)
 {
+    ImGui_ImplGlfw_KeyCallback(window, key, scancode, action, mods); // imgui key 콜백호출, 숫자를 키보드로 변경가능.
+
     SPDLOG_INFO("key: {}, scancode: {}, action: {}, mods: {}{}{}",
                 key, scancode,
                 action == GLFW_PRESS ? "Pressed" : action == GLFW_RELEASE ? "Released"
@@ -40,10 +42,22 @@ void OnCursorPos(GLFWwindow *window, double x, double y)
 // 마우스 클릭 콜백함수 정의
 void OnMouseButton(GLFWwindow *window, int button, int action, int modifier)
 {
+    ImGui_ImplGlfw_MouseButtonCallback(window, button, action, modifier); // imgui mouse button 콜백 호출
+
     auto context = (Context *)glfwGetWindowUserPointer(window);
     double x, y;
     glfwGetCursorPos(window, &x, &y);
     context->MouseButton(button, action, x, y);
+}
+
+void OnCharEvent(GLFWwindow *window, unsigned int ch)
+{
+    ImGui_ImplGlfw_CharCallback(window, ch);
+}
+
+void OnScroll(GLFWwindow *window, double xoffset, double yoffset)
+{
+    ImGui_ImplGlfw_ScrollCallback(window, xoffset, yoffset); // imgui 스크롤 콜백 호출.
 }
 
 int main(int argc, const char **argv)
@@ -119,8 +133,10 @@ int main(int argc, const char **argv)
     OnFramebufferSizeChange(window, WINDOW_WIDTH, WINDOW_HEIGHT);    // 윈도우 생성 직후에는 프레임버퍼 변경 이벤트가 발생하지 않으므로 첫 호출은 수동으로 함
     glfwSetFramebufferSizeCallback(window, OnFramebufferSizeChange); // glfwPollEvents()에서 이벤트를 수집하고, 그 이벤트에 해당하는 콜백을 세팅해놓으면 이벤트마다 실행됨.
     glfwSetKeyCallback(window, OnKeyEvent);
+    glfwSetCharCallback(window, OnCharEvent);
     glfwSetCursorPosCallback(window, OnCursorPos);
     glfwSetMouseButtonCallback(window, OnMouseButton);
+    glfwSetScrollCallback(window, OnScroll);
 
     // glfw 루프 실행, 윈도우 close 버튼을 누르면 정상 종료
     SPDLOG_INFO("Start main loop");
