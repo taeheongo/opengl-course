@@ -15,68 +15,104 @@ ContextUPtr Context::Create()
 bool Context::Init()
 {
     // 정점 데이터를 담은 array
-    // [x, y, z, s, t]
+    // pos.xyz, normal.xyz, texcoord.uv
     float vertices[] = {
         -0.5f,
         -0.5f,
         -0.5f,
         0.0f,
         0.0f,
+        -1.0f,
+        0.0f,
+        0.0f,
         0.5f,
         -0.5f,
         -0.5f,
+        0.0f,
+        0.0f,
+        -1.0f,
         1.0f,
         0.0f,
         0.5f,
         0.5f,
         -0.5f,
+        0.0f,
+        0.0f,
+        -1.0f,
         1.0f,
         1.0f,
         -0.5f,
         0.5f,
         -0.5f,
         0.0f,
-        1.0f,
-
-        -0.5f,
-        -0.5f,
-        0.5f,
         0.0f,
-        0.0f,
-        0.5f,
-        -0.5f,
-        0.5f,
-        1.0f,
-        0.0f,
-        0.5f,
-        0.5f,
-        0.5f,
-        1.0f,
-        1.0f,
-        -0.5f,
-        0.5f,
-        0.5f,
+        -1.0f,
         0.0f,
         1.0f,
 
         -0.5f,
+        -0.5f,
+        0.5f,
+        0.0f,
+        0.0f,
+        1.0f,
+        0.0f,
+        0.0f,
+        0.5f,
+        -0.5f,
+        0.5f,
+        0.0f,
+        0.0f,
+        1.0f,
+        1.0f,
+        0.0f,
         0.5f,
         0.5f,
+        0.5f,
+        0.0f,
+        0.0f,
+        1.0f,
+        1.0f,
+        1.0f,
+        -0.5f,
+        0.5f,
+        0.5f,
+        0.0f,
+        0.0f,
+        1.0f,
+        0.0f,
+        1.0f,
+
+        -0.5f,
+        0.5f,
+        0.5f,
+        -1.0f,
+        0.0f,
+        0.0f,
         1.0f,
         0.0f,
         -0.5f,
         0.5f,
         -0.5f,
+        -1.0f,
+        0.0f,
+        0.0f,
         1.0f,
         1.0f,
         -0.5f,
         -0.5f,
         -0.5f,
+        -1.0f,
+        0.0f,
+        0.0f,
         0.0f,
         1.0f,
         -0.5f,
         -0.5f,
         0.5f,
+        -1.0f,
+        0.0f,
+        0.0f,
         0.0f,
         0.0f,
 
@@ -85,66 +121,102 @@ bool Context::Init()
         0.5f,
         1.0f,
         0.0f,
-        0.5f,
-        0.5f,
-        -0.5f,
-        1.0f,
-        1.0f,
-        0.5f,
-        -0.5f,
-        -0.5f,
         0.0f,
         1.0f,
+        0.0f,
+        0.5f,
         0.5f,
         -0.5f,
-        0.5f,
+        1.0f,
         0.0f,
         0.0f,
-
-        -0.5f,
-        -0.5f,
-        -0.5f,
-        0.0f,
+        1.0f,
         1.0f,
         0.5f,
         -0.5f,
         -0.5f,
         1.0f,
+        0.0f,
+        0.0f,
+        0.0f,
         1.0f,
         0.5f,
         -0.5f,
         0.5f,
         1.0f,
         0.0f,
-        -0.5f,
-        -0.5f,
-        0.5f,
+        0.0f,
         0.0f,
         0.0f,
 
         -0.5f,
+        -0.5f,
+        -0.5f,
+        0.0f,
+        -1.0f,
+        0.0f,
+        0.0f,
+        1.0f,
         0.5f,
         -0.5f,
+        -0.5f,
+        0.0f,
+        -1.0f,
+        0.0f,
+        1.0f,
+        1.0f,
+        0.5f,
+        -0.5f,
+        0.5f,
+        0.0f,
+        -1.0f,
+        0.0f,
+        1.0f,
+        0.0f,
+        -0.5f,
+        -0.5f,
+        0.5f,
+        0.0f,
+        -1.0f,
+        0.0f,
+        0.0f,
+        0.0f,
+
+        -0.5f,
+        0.5f,
+        -0.5f,
+        0.0f,
+        1.0f,
+        0.0f,
         0.0f,
         1.0f,
         0.5f,
         0.5f,
         -0.5f,
+        0.0f,
+        1.0f,
+        0.0f,
         1.0f,
         1.0f,
         0.5f,
         0.5f,
         0.5f,
+        0.0f,
+        1.0f,
+        0.0f,
         1.0f,
         0.0f,
         -0.5f,
         0.5f,
         0.5f,
+        0.0f,
+        1.0f,
+        0.0f,
         0.0f,
         0.0f,
     };
     // 정점 인덱스를 담은 array
-    // 한 면당 2개의 삼각형이 필요하므로 12개의 삼각형이 필요.
+    // 한 면당 2개의 삼각형이 필요하므로 12개의 삼각형이 필요. 12*3= 36개의 인덱스 원소
     uint32_t indices[] = {
         0,
         2,
@@ -189,13 +261,11 @@ bool Context::Init()
     // VAO(Vertex Attribute Object) 생성 및 바인딩
     m_vertexLayout = VertexLayout::Create();
 
-    // VBO(Vertex Buffer Object) 생성, 바인딩, 정점 데이터 추가
-    m_vertexBuffer = Buffer::CreateWithData(GL_ARRAY_BUFFER, GL_STATIC_DRAW, vertices, sizeof(float) * 120);
+    m_vertexBuffer = Buffer::CreateWithData(GL_ARRAY_BUFFER, GL_STATIC_DRAW, vertices, sizeof(float) * 8 * 6 * 4);
 
-    // vertex attribute setting
-    // m_vertexLayout->SetAttrib(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, 0);
-    m_vertexLayout->SetAttrib(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 5, 0);
-    m_vertexLayout->SetAttrib(2, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 5, sizeof(float) * 3); // 텍스쳐 좌표는 2차원 이므로 두 번째 인자는 2
+    m_vertexLayout->SetAttrib(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 8, 0);
+    m_vertexLayout->SetAttrib(1, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 8, sizeof(float) * 3);
+    m_vertexLayout->SetAttrib(2, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 8, sizeof(float) * 6);
 
     // EBO(Element Buffer Object) 생성, 바인딩, 인덱스 데이터 추가
     m_indexBuffer = Buffer::CreateWithData(GL_ELEMENT_ARRAY_BUFFER, GL_STATIC_DRAW, indices, sizeof(uint32_t) * 36);
@@ -273,19 +343,19 @@ void Context::Render()
             m_cameraPitch = 0.0f;
             m_cameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
         }
-        if (ImGui::CollapsingHeader("light"))
+
+        // ImGuiTreeNodeFlags_DefaultOpen를 ImGui::CollapsingHeader의 두번째 인자로 주면 처음에 접혀있지 않고 열려있음.
+        if (ImGui::CollapsingHeader("light", ImGuiTreeNodeFlags_DefaultOpen))
         {
+            ImGui::DragFloat3("light pos", glm::value_ptr(m_lightPos), 0.01f);
             ImGui::ColorEdit3("light color", glm::value_ptr(m_lightColor));
             ImGui::ColorEdit3("object color", glm::value_ptr(m_objectColor));
             ImGui::SliderFloat("ambient strength", &m_ambientStrength, 0.0f, 1.0f);
         }
+
+        ImGui::Checkbox("animation", &m_animation);
     }
     ImGui::End();
-
-    m_program->Use();
-    m_program->SetUniform("lightColor", m_lightColor);
-    m_program->SetUniform("objectColor", m_objectColor);
-    m_program->SetUniform("ambientStrength", m_ambientStrength);
 
     // 깊이 테스트 (Depth test) : 어떤 픽셀의 값을 업데이트 하기 전, 현재 그리려는 픽셀의 z값과 깊이 버퍼에 저장된 해당 위치의 z값을 비교해 봄.
     //                           비교 결과 현재 그리려는 픽셀이 이전에 그려진 픽셀보다 뒤에 있을 경우 픽셀을 그리지 않음
@@ -309,6 +379,24 @@ void Context::Render()
         m_cameraUp);                                                                                         // UP
     auto projection = glm::perspective(glm::radians(45.0f), (float)m_width / (float)m_height, 0.01f, 30.0f); // (fovy, aspect, near, far) far를 크게해주면 잘리는것을 막을 수 있음.
 
+    // 광원 상자를 광원에 맞는 uniform변수들로 그린다.
+    auto lightModelTransform = glm::translate(glm::mat4(1.0), m_lightPos) * glm::scale(glm::mat4(1.0), glm::vec3(0.1f));
+    m_program->Use();
+    m_program->SetUniform("lightPos", m_lightPos);
+    m_program->SetUniform("lightColor", glm::vec3(1.0f, 1.0f, 1.0f));
+    m_program->SetUniform("objectColor", glm::vec3(1.0f, 1.0f, 1.0f));
+    m_program->SetUniform("ambientStrength", 1.0f);
+    m_program->SetUniform("transform", projection * view * lightModelTransform);
+    m_program->SetUniform("modelTransform", lightModelTransform);
+    glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
+
+    // 상자들은 상자들에 맞는 uniform변수들로 그린다.
+    m_program->Use();
+    m_program->SetUniform("lightPos", m_lightPos);
+    m_program->SetUniform("lightColor", m_lightColor);
+    m_program->SetUniform("objectColor", m_objectColor);
+    m_program->SetUniform("ambientStrength", m_ambientStrength);
+
     // 여러개의 회전하는 큐브
     // 큐브마다 translate해줄 값을 cubePositions에 저장.
     std::vector<glm::vec3> cubePositions = {
@@ -328,11 +416,12 @@ void Context::Render()
     {
         auto &pos = cubePositions[i];
         auto model = glm::translate(glm::mat4(1.0f), pos);
-        model = glm::rotate(model, glm::radians((float)glfwGetTime() * 120.0f + 20.0f * (float)i), glm::vec3(1.0f, 0.5f, 0.0f));
+        auto angle = glm::radians((m_animation ? (float)glfwGetTime() : 0.0f) * 120.0f + 20.0f * (float)i);
+        model = glm::rotate(model, angle, glm::vec3(1.0f, 0.5f, 0.0f));
         auto transform = projection * view * model;
 
         m_program->SetUniform("transform", transform);
-
+        m_program->SetUniform("modelTransform", model);
         // 현재 바인딩된 VAO, VBO, EBO를 바탕으로 그리기
         glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0); // 첫번째 인자는 primitive: 그려낼 기본 primitive 타입,
                                                               // 두번째 인자는 그리고자 하는 EBO 내 index의 개수 6,
