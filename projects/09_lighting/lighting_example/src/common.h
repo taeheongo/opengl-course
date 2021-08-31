@@ -31,4 +31,6 @@ std::optional<std::string> LoadTextFile(const std::string &filename); // std::st
                                                                       // 그 메모리를 해제를 해줘야하는데 해제를 잊어버리면 그 메모리가 누수가됨. 그래서 optional을 사용함.
                                                                       // optional은 값이 들어있으면 꺼내서 쓸 수 있고, 값이 없으면 꺼낼 수 없음.
 
+glm::vec3 GetAttenuationCoeff(float distance); // 라이트 캐스터가 point light일때 거리에 따른 감쇠값구하는 함수
+
 #endif // __COMMON_H__
