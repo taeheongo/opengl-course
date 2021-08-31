@@ -14,6 +14,7 @@ public:
                                                                       // std::vector<ShaderPtr> 타입으로 인자를 받음.(레퍼런스로 받아서 복사 x)
                                                                       // Shader 인스턴스는 다른 Program 인스턴스를 만드는 데 재사용할 수도 있음.
                                                                       // 따라서 shared pointer를 사용: ShaderPtr(메모리 소유권 공유)
+    static ProgramUPtr Create(const std::string &vertShaderFilename, const std::string &fragShaderFilename);
 
     ~Program();
     uint32_t Get() const { return m_program; }
@@ -21,6 +22,7 @@ public:
     void SetUniform(const std::string &name, int value) const;
     void SetUniform(const std::string &name, float value) const;
     void SetUniform(const std::string &name, const glm::vec3 &value) const;
+    void SetUniform(const std::string &name, const glm::vec4 &value) const;
     void SetUniform(const std::string &name, const glm::mat4 &value) const;
 
 private:

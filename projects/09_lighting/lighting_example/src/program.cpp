@@ -8,6 +8,20 @@ ProgramUPtr Program::Create(const std::vector<ShaderPtr> &shaders)
     return std::move(program);
 }
 
+ProgramUPtr Program::Create(const std::string &vertShaderFilename, const std::string &fragShaderFilename)
+{
+    ShaderPtr vs = Shader::CreateFromFile(vertShaderFilename, GL_VERTEX_SHADER);
+    ShaderPtr fs = Shader::CreateFromFile(fragShaderFilename, GL_FRAGMENT_SHADER);
+    /* 
+        앞에 ShaderPtr로 타입을 명시해줘야 unique_ptr이 shadred_ptr로 바뀐다.
+        auto로 쓰면 CreateFromFile의 반환타이빈 unique_ptr이 그대로 쓰인다. 
+        auto vertShader = Shader::CreateFromFile("./shader/simple.vs", GL_VERTEX_SHADER);
+    */
+    if (!vs || !fs)
+        return nullptr;
+    return std::move(Create({vs, fs}));
+}
+
 bool Program::Link(const std::vector<ShaderPtr> &shaders)
 {
     m_program = glCreateProgram(); // glCreateShader와 같이 u_int32t 타입으로 반환
@@ -78,4 +92,10 @@ void Program::SetUniform(const std::string &name, const glm::vec3 &value) const
     auto loc = glGetUniformLocation(m_program, name.c_str());
     glUniform3fv(loc, 1, glm::value_ptr(value));
     // glUniform3f(loc, value.x, value.y, value.z); // glUnfirom3f를 사용할 수도 있다.
+}
+
+void Program::SetUniform(const std::string &name, const glm::vec4 &value) const
+{
+    auto loc = glGetUniformLocation(m_program, name.c_str());
+    glUniform4fv(loc, 1, glm::value_ptr(value));
 }
