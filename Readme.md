@@ -20,3 +20,4 @@
 - [x] transformation_example
 - [x] imgui_example
 - [x] lighting_example
+- [x] object_example
