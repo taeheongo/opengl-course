@@ -100,6 +100,7 @@ void Context::Render()
             ImGui::ColorEdit3("l.ambient", glm::value_ptr(m_light.ambient));
             ImGui::ColorEdit3("l.diffuse", glm::value_ptr(m_light.diffuse));
             ImGui::ColorEdit3("l.specular", glm::value_ptr(m_light.specular));
+            ImGui::Checkbox("flash light", &m_flashLightMode);
         }
 
         if (ImGui::CollapsingHeader("material", ImGuiTreeNodeFlags_DefaultOpen))
@@ -127,27 +128,35 @@ void Context::Render()
         glm::rotate(glm::mat4(1.0f), glm::radians(m_cameraPitch), glm::vec3(1.0f, 0.0f, 0.0f)) *
         glm::vec4(0.0f, 0.0f, -1.0f, 0.0f);
 
-    // m_light.position = m_cameraPos;
-    // m_light.direction = m_cameraFront;
-
     auto view = glm::lookAt(
         m_cameraPos,                                                                                         // 카메라 위치 EYE
         m_cameraPos + m_cameraFront,                                                                         // EYE + n = AT
         m_cameraUp);                                                                                         // UP
     auto projection = glm::perspective(glm::radians(45.0f), (float)m_width / (float)m_height, 0.01f, 30.0f); // (fovy, aspect, near, far) far를 크게해주면 잘리는것을 막을 수 있음.
 
-    // 광원에 맞는 uniform변수 설정.
-    auto lightModelTransform = glm::translate(glm::mat4(1.0), m_light.position) * glm::scale(glm::mat4(1.0), glm::vec3(0.1f));
-    m_simpleProgram->Use();
-    m_simpleProgram->SetUniform("color", glm::vec4(m_light.ambient + m_light.diffuse, 1.0f));
-    m_simpleProgram->SetUniform("transform", projection * view * lightModelTransform);
-    m_box->Draw();
+    // model에 대한 uniform변수들 설정.
+    glm::vec3 lightPos = m_light.position;
+    glm::vec3 lightDir = m_light.direction;
 
-    // model에 대한 uniform변수 설정.
+    if (m_flashLightMode)
+    {
+        lightPos = m_cameraPos;
+        lightDir = m_cameraFront;
+    }
+    else
+    {
+        // 광원에 대한 uniform변수들 설정.
+        auto lightModelTransform = glm::translate(glm::mat4(1.0), m_light.position) * glm::scale(glm::mat4(1.0), glm::vec3(0.1f));
+        m_simpleProgram->Use();
+        m_simpleProgram->SetUniform("color", glm::vec4(m_light.ambient + m_light.diffuse, 1.0f));
+        m_simpleProgram->SetUniform("transform", projection * view * lightModelTransform);
+        m_box->Draw(m_program.get());
+    }
+
     m_program->Use();
     m_program->SetUniform("viewPos", m_cameraPos);
-    m_program->SetUniform("light.position", m_light.position);
-    m_program->SetUniform("light.direction", m_light.direction);
+    m_program->SetUniform("light.position", lightPos);
+    m_program->SetUniform("light.direction", lightDir);
     m_program->SetUniform("light.cutoff", glm::vec2(
                                               cosf(glm::radians(m_light.cutoff[0])),
                                               cosf(glm::radians(m_light.cutoff[0] + m_light.cutoff[1]))));
@@ -171,7 +180,7 @@ void Context::Render()
     m_program->SetUniform("transform", transform);
     m_program->SetUniform("modelTransform", modelTransform);
 
-    m_model->Draw();
+    m_model->Draw(m_program.get());
 }
 
 void Context::ProcessInput(GLFWwindow *window)
