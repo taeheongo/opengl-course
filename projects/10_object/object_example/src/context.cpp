@@ -15,6 +15,9 @@ ContextUPtr Context::Create()
 bool Context::Init()
 {
     m_box = Mesh::CreateBox();
+    m_model = Model::Load("./model/backpack.obj");
+    if (!m_model)
+        return false;
 
     // program 생성
     m_simpleProgram = Program::Create("./shader/simple.vs", "./shader/simple.fs");
@@ -45,8 +48,13 @@ bool Context::Init()
 
     m_texture2 = Texture::CreateFromImage(image2.get());
 
-    m_material.diffuse = Texture::CreateFromImage(Image::Load("./image/container2.png").get());
-    m_material.specular = Texture::CreateFromImage(Image::Load("./image/container2_specular.png").get());
+    // m_material.diffuse = Texture::CreateFromImage(Image::Load("./image/container2.png").get());
+    // m_material.specular = Texture::CreateFromImage(Image::Load("./image/container2_specular.png").get());
+
+    m_material.diffuse = Texture::CreateFromImage(
+        Image::CreateSingleColorImage(4, 4, glm::vec4(1.0f, 1.0f, 1.0f, 1.0f)).get());
+    m_material.specular = Texture::CreateFromImage(
+        Image::CreateSingleColorImage(4, 4, glm::vec4(0.5f, 0.5f, 0.5f, 1.0f)).get());
 
     glActiveTexture(GL_TEXTURE0);                   // glActiveTexture(textureSlot) : 함수로 현재 다루고자 하는 텍스처 슬롯을 선택
     glBindTexture(GL_TEXTURE_2D, m_texture->Get()); // glBindTexture(textureType, textureId) : 함수로 현재 설정중인 텍스처 슬롯에 우리의 텍스처 오브젝트를 바인딩
@@ -128,25 +136,26 @@ void Context::Render()
         m_cameraUp);                                                                                         // UP
     auto projection = glm::perspective(glm::radians(45.0f), (float)m_width / (float)m_height, 0.01f, 30.0f); // (fovy, aspect, near, far) far를 크게해주면 잘리는것을 막을 수 있음.
 
-    // 광원 상자를 광원에 맞는 uniform변수들로 그린다.
+    // 광원에 맞는 uniform변수 설정.
     auto lightModelTransform = glm::translate(glm::mat4(1.0), m_light.position) * glm::scale(glm::mat4(1.0), glm::vec3(0.1f));
     m_simpleProgram->Use();
     m_simpleProgram->SetUniform("color", glm::vec4(m_light.ambient + m_light.diffuse, 1.0f));
     m_simpleProgram->SetUniform("transform", projection * view * lightModelTransform);
     m_box->Draw();
 
-    // 상자들은 상자들에 맞는 uniform변수들로 그린다.
+    // model에 대한 uniform변수 설정.
     m_program->Use();
     m_program->SetUniform("viewPos", m_cameraPos);
     m_program->SetUniform("light.position", m_light.position);
     m_program->SetUniform("light.direction", m_light.direction);
     m_program->SetUniform("light.cutoff", glm::vec2(
-                                              cosf(glm::radians(m_light.cutoff[0])),                       // inner
-                                              cosf(glm::radians(m_light.cutoff[0] + m_light.cutoff[1])))); // outer
+                                              cosf(glm::radians(m_light.cutoff[0])),
+                                              cosf(glm::radians(m_light.cutoff[0] + m_light.cutoff[1]))));
     m_program->SetUniform("light.attenuation", GetAttenuationCoeff(m_light.distance));
     m_program->SetUniform("light.ambient", m_light.ambient);
     m_program->SetUniform("light.diffuse", m_light.diffuse);
     m_program->SetUniform("light.specular", m_light.specular);
+
     m_program->SetUniform("material.diffuse", 0);
     m_program->SetUniform("material.specular", 1);
     m_program->SetUniform("material.shininess", m_material.shininess);
@@ -156,33 +165,13 @@ void Context::Render()
     glActiveTexture(GL_TEXTURE1);
     m_material.specular->Bind();
 
-    // 여러개의 회전하는 큐브
-    // 큐브마다 translate해줄 값을 cubePositions에 저장.
-    std::vector<glm::vec3> cubePositions = {
-        glm::vec3(0.0f, 0.0f, 0.0f),
-        glm::vec3(2.0f, 5.0f, -15.0f),
-        glm::vec3(-1.5f, -2.2f, -2.5f),
-        glm::vec3(-3.8f, -2.0f, -12.3f),
-        glm::vec3(2.4f, -0.4f, -3.5f),
-        glm::vec3(-1.7f, 3.0f, -7.5f),
-        glm::vec3(1.3f, -2.0f, -2.5f),
-        glm::vec3(1.5f, 2.0f, -2.5f),
-        glm::vec3(1.5f, 0.2f, -1.5f),
-        glm::vec3(-1.3f, 1.0f, -1.5f),
-    };
+    auto modelTransform = glm::mat4(1.0f);
+    auto transform = projection * view * modelTransform;
 
-    for (size_t i = 0; i < cubePositions.size(); i++)
-    {
-        auto &pos = cubePositions[i];
-        auto model = glm::translate(glm::mat4(1.0f), pos);
-        auto angle = glm::radians((m_animation ? (float)glfwGetTime() : 0.0f) * 120.0f + 20.0f * (float)i);
-        model = glm::rotate(model, angle, glm::vec3(1.0f, 0.5f, 0.0f));
-        auto transform = projection * view * model;
+    m_program->SetUniform("transform", transform);
+    m_program->SetUniform("modelTransform", modelTransform);
 
-        m_program->SetUniform("transform", transform);
-        m_program->SetUniform("modelTransform", model);
-        m_box->Draw();
-    }
+    m_model->Draw();
 }
 
 void Context::ProcessInput(GLFWwindow *window)

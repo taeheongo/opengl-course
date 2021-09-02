@@ -19,6 +19,7 @@ add_executable(${PROJECT_NAME}
   src/image.cpp src/image.h
   src/texture.cpp src/texture.h
   src/mesh.cpp src/mesh.h
+  src/model.cpp src/model.h
   ) # cpp파일들을 컴파일해서 실행파일을 만든다. 
     # 컴파일은 cpp파일만 하는 것이지만 헤더파일까지 포함시키는 이유는 해더파일이 변경되었을 때 컴파일을 다시 시키기위하여
 

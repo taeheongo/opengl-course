@@ -17,6 +17,7 @@ public:
     int GetChannelCount() const { return m_channelCount; }
 
     void SetCheckImage(int gridX, int gridY);
+    static ImageUPtr CreateSingleColorImage(int width, int height, const glm::vec4 &color);
 
 private:
     Image(){};
