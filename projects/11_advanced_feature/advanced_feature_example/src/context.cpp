@@ -125,10 +125,10 @@ void Context::Render()
         glm::vec4(0.0f, 0.0f, -1.0f, 0.0f);
 
     auto view = glm::lookAt(
-        m_cameraPos,                                                                                         // 카메라 위치 EYE
-        m_cameraPos + m_cameraFront,                                                                         // EYE + n = AT
-        m_cameraUp);                                                                                         // UP
-    auto projection = glm::perspective(glm::radians(45.0f), (float)m_width / (float)m_height, 0.05f, 20.0f); // (fovy, aspect, near, far) far를 크게해주면 잘리는것을 막을 수 있음.
+        m_cameraPos,                                                                                           // 카메라 위치 EYE
+        m_cameraPos + m_cameraFront,                                                                           // EYE + n = AT
+        m_cameraUp);                                                                                           // UP
+    auto projection = glm::perspective(glm::radians(45.0f), (float)m_width / (float)m_height, 0.05f, 1000.0f); // (fovy, aspect, near, far) far를 크게해주면 잘리는것을 막을 수 있음.
 
     // model에 대한 uniform변수들 설정.
     glm::vec3 lightPos = m_light.position;
@@ -181,7 +181,7 @@ void Context::Render()
     m_box->Draw(m_program.get());
 
     modelTransform =
-        glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.75f, 2.0f)) *
+        glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, -0.749f, 2.0f)) *
         glm::rotate(glm::mat4(1.0f), glm::radians(20.0f), glm::vec3(0.0f, 1.0f, 0.0f)) *
         glm::scale(glm::mat4(1.0f), glm::vec3(1.5f, 1.5f, 1.5f));
     transform = projection * view * modelTransform;
